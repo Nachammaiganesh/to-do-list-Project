@@ -1,0 +1,76 @@
+def show_menu():
+    a = f'''
+To-Do List Menu
+1. View To-Do List
+2. Add Task
+3. Remove Task
+4. Exit '''
+    print(a)
+
+
+def view_task(tasks):
+    if not tasks:
+        print("\n")
+        print("Your To-Do list is empty.")
+    else:
+        print("\n")
+        for i, task in enumerate(tasks, start=1):
+            print(f"{i}. {task}")
+
+
+def add_tasks(tasks):
+    task = input("Enter a new task: ")
+    tasks.append(task)
+    print(f"{task} has been added to the list.")
+
+
+def remove_tasks(tasks):
+    view_task(tasks)
+    try:
+        task_number = int(input("Enter the task number to remove: "))
+        if 1 <= task_number <= len(tasks):
+            removed_task = tasks.pop(task_number - 1)
+            print(f'"{removed_task}" has been removed.')
+        else:
+            print("Invalid task number.")
+    except ValueError:
+        print("Pleases Enter a Valid Number.")
+
+
+def save_tasks(tasks, filename="tasks.txt"):
+    with open(filename, "w") as file:
+        for task in tasks:
+            file.write(task + "\n")
+
+
+def load_tasks(filename="tasks.txt"):
+    try:
+        with open(filename, "r") as file:
+            tasks = [line.strip() for line in file.readlines()]
+    except FileNotFoundError:
+        tasks = []
+    return tasks
+
+
+def main():
+    tasks = load_tasks()
+    while True:
+        show_menu()
+        choice = input("Choose an option (1-4): ")
+        if choice == "1":
+            view_task(tasks)
+        elif choice == "2":
+            add_tasks(tasks)
+            save_tasks(tasks)
+        elif choice == "3":
+            remove_tasks(tasks)
+            save_tasks(tasks)
+        elif choice == "4":
+            print("Good Bye!")
+            break
+        else:
+            print("Invalid Choice, Please Try Again.")
+
+
+if __name__ == "__main__":
+    main()
