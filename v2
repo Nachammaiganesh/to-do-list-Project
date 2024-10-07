@@ -1,0 +1,64 @@
+def show_menu():
+    menu = '''
+To-Do List Menu
+1. View To-Do List
+2. Add Task
+3. Remove Task
+4. Exit '''
+    print(menu)
+
+
+def view_tasks(tasks):
+    if not tasks:
+        print("\nYour To-Do list is empty.")
+    else:
+        print("\nYour To-Do List:")
+        for task in tasks:
+            print(f"{task['task_id']}. {task['name']} - {task['description']}")
+
+
+def add_task(tasks):
+    name = input("Enter the task name: ")
+    description = input("Enter the task description: ")
+    task_id = len(tasks) + 1  # Assign the next task ID
+    tasks.append({'task_id': task_id, 'name': name, 'description': description})
+    print(f'Task "{name}" has been added to the list.')
+
+
+def remove_task(tasks):
+    view_tasks(tasks)
+    try:
+        task_id = int(input("Enter the task ID to remove: "))
+        task_to_remove = next((task for task in tasks if task['task_id'] == task_id), None)
+        if task_to_remove:
+            tasks.remove(task_to_remove)
+            print(f'Task "{task_to_remove["name"]}" has been removed.')
+            # Update task IDs
+            for i, task in enumerate(tasks):
+                task['task_id'] = i + 1
+        else:
+            print("Invalid task ID.")
+    except ValueError:
+        print("Please enter a valid number.")
+
+
+def main():
+    tasks = []  # Use an in-memory list to store tasks
+    while True:
+        show_menu()
+        choice = input("Choose an option (1-4): ")
+        if choice == "1":
+            view_tasks(tasks)
+        elif choice == "2":
+            add_task(tasks)
+        elif choice == "3":
+            remove_task(tasks)
+        elif choice == "4":
+            print("Good Bye!")
+            break
+        else:
+            print("Invalid choice, please try again.")
+
+
+if __name__ == "__main__":
+    main()
