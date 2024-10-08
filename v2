@@ -11,8 +11,6 @@ insertdoc=collection.insert_one(document)
 print("Inserted")
 client.close()
 
-
-
 from datetime import datetime
 from pymongo import MongoClient
  
@@ -39,18 +37,25 @@ def view_tasks(collection):
     else:
         print("\n")
         for i, task in enumerate(tasks, start=1):
-            print(f"{i}. {task['task_name']}")  # Adjust according to your schema
+            task_name = task.get('task_name', 'Unnamed Task')  # Use .get() to safely access the key
+            print(f"{i}. {task_name}")
+
  
 def add_task(collection):
     task_name = input("Enter a new task: ")
-    task = {
-        "task_name": task_name,
-        "description": "",  # You can prompt for this if needed
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # Format as string
-        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")   # Format as string
-    }
-    collection.insert_one(task)  # Insert task into MongoDB
-    print(f"{task_name} has been added to the list.")
+    description = input("Enter new description: ")
+    if task_name:  # Ensure task_name is not empty
+        task = {
+            "task_name": task_name,
+            "description": description,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        collection.insert_one(task)
+        print(f"{task_name} has been added to the list.")
+    else:
+        print("Task name cannot be empty.")
+
  
 def remove_task(collection):
     view_tasks(collection)  # Show current tasks
@@ -92,4 +97,4 @@ def main():
         print("MongoDB connection closed.")
  
 if __name__ == "__main__":
-    main()
+    main()               
