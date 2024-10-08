@@ -1,6 +1,12 @@
-MONGO_URL = "mongodb+srv://nachammaiganesan01:Nachammai2001@tododb.zthr6.mongodb.net/"  # Change this to your MongoDB URI
-client = MongoClient(MONGO_URL)
-
-# Access the database and collection
-db = client["MongoDBVSCodePlaygroundDB"]  # Replace with your database name
-collection = db["user"]  # Replace with your collection name
+from pymongo import MongoClient
+ 
+client=MongoClient('mongodb+srv://nachammaiganesan01:Nachammai2001@tododb.zthr6.mongodb.net/?retryWrites=true&w=majority&appName=ToDoDb')
+ 
+db=client['todo_db']
+collection=db['user_collection']
+ 
+document={"user_id":"user124","task_id":"task002"}
+insertdoc=collection.insert_one(document)
+ 
+print("Inserted")
+client.close()
