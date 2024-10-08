@@ -4,9 +4,4 @@ client=MongoClient('mongodb+srv://nachammaiganesan01:Nachammai2001@tododb.zthr6.
  
 db=client['todo_db']
 collection=db['user_collection']
- 
-document={"user_id":"user124","task_id":"task002"}
-insertdoc=collection.insert_one(document)
- 
-print("Inserted")
 client.close()
