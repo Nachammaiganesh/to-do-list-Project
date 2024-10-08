@@ -1,0 +1,95 @@
+from pymongo import MongoClient
+ 
+client=MongoClient('mongodb+srv://nachammaiganesan01:Nachammai2001@tododb.zthr6.mongodb.net/?retryWrites=true&w=majority&appName=ToDoDb')
+ 
+db=client['todo_db']
+collection=db['user_collection']
+ 
+document={"user_id":"user124","task_id":"task002"}
+insertdoc=collection.insert_one(document)
+ 
+print("Inserted")
+client.close()
+
+
+
+from datetime import datetime
+from pymongo import MongoClient
+ 
+def connect_to_mongodb():
+    client = MongoClient('mongodb+srv://nachammaiganesan01:Nachammai2001@tododb.zthr6.mongodb.net/?retryWrites=true&w=majority&appName=ToDoDb')
+   
+    db = client['todo_db']  # Specify your database
+    collection = db['user_collection']  # Specify your collection
+    return client, collection
+ 
+def show_menu():
+    a = '''
+To-Do List Menu
+1. View To-Do List
+2. Add Task
+3. Remove Task
+4. Exit '''
+    print(a)
+ 
+def view_tasks(collection):
+    tasks = list(collection.find())  # Fetch all tasks from MongoDB
+    if not tasks:
+        print("\nYour To-Do list is empty.")
+    else:
+        print("\n")
+        for i, task in enumerate(tasks, start=1):
+            print(f"{i}. {task['task_name']}")  # Adjust according to your schema
+ 
+def add_task(collection):
+    task_name = input("Enter a new task: ")
+    task = {
+        "task_name": task_name,
+        "description": "",  # You can prompt for this if needed
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # Format as string
+        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")   # Format as string
+    }
+    collection.insert_one(task)  # Insert task into MongoDB
+    print(f"{task_name} has been added to the list.")
+ 
+def remove_task(collection):
+    view_tasks(collection)  # Show current tasks
+    tasks = list(collection.find())  # Fetch all tasks from MongoDB
+    try:
+        task_number = int(input("Enter the task number to remove: "))
+        if 1 <= task_number <= len(tasks):
+            removed_task = tasks[task_number - 1]
+            collection.delete_one({"_id": removed_task["_id"]})  # Remove task from MongoDB
+            print(f'"{removed_task["task_name"]}" has been removed.')
+        else:
+            print("Invalid task number.")
+    except ValueError:
+        print("Please Enter a Valid Number.")
+ 
+def main():
+    # Connect to MongoDB
+    client, collection = connect_to_mongodb()
+   
+    try:
+        while True:
+            show_menu()
+            choice = input("Choose an option (1-4): ")
+            if choice == "1":
+                view_tasks(collection)
+            elif choice == "2":
+                add_task(collection)
+            elif choice == "3":
+                remove_task(collection)
+            elif choice == "4":
+                print("Good Bye!")
+                break
+            else:
+                print("Invalid Choice, Please Try Again.")
+   
+    finally:
+        # Ensure MongoDB connection is closed
+        client.close()
+        print("MongoDB connection closed.")
+ 
+if __name__ == "__main__":
+    main()
