@@ -1,0 +1,93 @@
+from datetime import datetime
+from pymongo import MongoClient
+import json
+
+def connect_to_mongodb():
+    # Use environment variables for security
+    client = MongoClient('mongodb+srv://<username>:<password>@tododb.zthr6.mongodb.net/?retryWrites=true&w=majority&appName=ToDoDb')
+    db = client['todo_db']  # Specify your database
+    collection = db['user_collection']  # Specify your collection
+    return client, collection
+
+def lambda_handler(event, context):
+    client, collection = connect_to_mongodb()
+    
+    try:
+        if event['httpMethod'] == 'GET':
+            return view_tasks(collection)
+        elif event['httpMethod'] == 'POST':
+            body = json.loads(event['body'])
+            return add_task(collection, body)
+        elif event['httpMethod'] == 'DELETE':
+            body = json.loads(event['body'])
+            return remove_task(collection, body)
+        else:
+            return {
+                'statusCode': 400,
+                'body': json.dumps('Unsupported method')
+            }
+    finally:
+        client.close()
+
+def view_tasks(collection):
+    tasks = list(collection.find())
+    if not tasks:
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Your To-Do list is empty.')
+        }
+    
+    tasks_list = []
+    for task in tasks:
+        tasks_list.append({
+            'task_name': task.get('task_name', 'Unnamed Task'),
+            'description': task.get('description', 'No description provided')
+        })
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps(tasks_list)
+    }
+
+def add_task(collection, body):
+    task_name = body.get("task_name")
+    description = body.get("description")
+
+    if task_name:
+        task = {
+            "task_name": task_name,
+            "description": description,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        collection.insert_one(task)
+        return {
+            'statusCode': 201,
+            'body': json.dumps(f'Task "{task_name}" has been added to the list.')
+        }
+    else:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Task name cannot be empty.')
+        }
+
+def remove_task(collection, body):
+    task_id = body.get("task_id")
+    
+    if task_id:
+        result = collection.delete_one({"_id": task_id})
+        if result.deleted_count > 0:
+            return {
+                'statusCode': 200,
+                'body': json.dumps('Task has been removed.')
+            }
+        else:
+            return {
+                'statusCode': 404,
+                'body': json.dumps('Task not found.')
+            }
+    else:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Task ID must be provided.')
+        }
