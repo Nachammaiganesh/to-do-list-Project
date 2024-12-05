@@ -1,5 +1,14 @@
 from datetime import datetime
+from pymongo import MongoClient
+import json
 
+def connect_to_mongodb():
+    # Use environment variables for security
+    client = MongoClient('mongodb+srv://<username>:<password>@tododb.zthr6.mongodb.net/?retryWrites=true&w=majority&appName=ToDoDb')
+    db = client['todo_db']  # Specify your database
+    collection = db['user_collection']  # Specify your collection
+    return client, collection
+    
 def show_menu():
     a = '''
 To-Do List Menu
