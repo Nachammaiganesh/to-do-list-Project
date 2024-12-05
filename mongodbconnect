@@ -1,7 +1,0 @@
-from pymongo import MongoClient
- 
-client=MongoClient('mongodb+srv://nachammaiganesan01:Nachammai2001@tododb.zthr6.mongodb.net/?retryWrites=true&w=majority&appName=ToDoDb')
- 
-db=client['todo_db']
-collection=db['user_collection']
-client.close()
